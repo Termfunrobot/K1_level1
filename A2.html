@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>การเรียนรู้แสนสนุกโดย สมาร์ทโรโบติกส์</title>
+    <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-yellow: #ffeb3b;
+            --primary-orange: #ff9800;
+            --soft-blue: #e3f2fd;
+            --font-main: 'Mali', cursive;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--soft-blue);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        header {
+            background: linear-gradient(180deg, #ffeb3b, #fff176);
+            padding: 25px 20px;
+            text-align: center;
+            border-bottom: 8px dashed #ff9800;
+            position: relative;
+        }
+
+        .header-main-title {
+            color: #d32f2f;
+            font-size: 1.8rem;
+            margin: 0;
+            text-shadow: 2px 2px white;
+        }
+
+        .header-sub-title {
+            color: #1976d2;
+            font-size: 1.2rem;
+            margin: 5px 0 10px 0;
+            font-weight: bold;
+        }
+
+        .score-display {
+            background: #fff;
+            padding: 10px 25px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #ff9800;
+            border: 3px solid #ff9800;
+            font-size: 1.2rem;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; min-height: 600px; }
+
+        .pagination {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+            background: white;
+            padding: 15px;
+            border-radius: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .page-btn {
+            background-color: #f5f5f5;
+            border: 2px solid #ff9800;
+            color: #ff9800;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: var(--font-main);
+            transition: 0.2s;
+        }
+
+        .page-btn.active {
+            background-color: #ff9800;
+            color: white;
+            box-shadow: 0 4px 0 #ef6c00;
+        }
+
+        .week-title-display {
+            text-align: center;
+            color: #2e7d32;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            background: #c8e6c9;
+            padding: 10px;
+            border-radius: 15px;
+            display: block;
+        }
+
+        .lesson-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .lesson-card {
+            background: white;
+            border-radius: 30px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            border: 4px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .lesson-card:hover { 
+            transform: translateY(-5px);
+            border-color: #ff9800;
+        }
+
+        .icon-box { font-size: 4.5rem; margin-bottom: 10px; display: block; }
+        h3 { font-size: 1.3rem; color: #2c3e50; margin: 5px 0; }
+        
+        .btn-container { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+
+        .btn-audio {
+            background-color: #3498db; color: white; padding: 12px; border-radius: 25px;
+            border: none; cursor: pointer; font-family: var(--font-main); font-size: 0.95rem;
+            transition: 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 5px;
+        }
+
+        .btn-audio:active { transform: scale(0.95); }
+
+        .btn-play {
+            background-color: #4caf50; color: white; padding: 12px; border-radius: 25px;
+            border: none; font-weight: bold; cursor: pointer; font-family: var(--font-main); font-size: 0.95rem;
+            transition: 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 5px;
+        }
+
+        .btn-play.locked {
+            background-color: #ccc;
+            cursor: pointer;
+            opacity: 0.7;
+        }
+
+        .modal {
+            display: none; position: fixed; z-index: 1000; left: 0; top: 0; 
+            width: 100%; height: 100%; background-color: rgba(0,0,0,0.9);
+            align-items: center; justify-content: center;
+        }
+
+        .modal-content {
+            background: white; padding: 35px; border-radius: 40px;
+            max-width: 500px; width: 90%; text-align: center; position: relative;
+            border: 8px solid var(--primary-yellow);
+        }
+
+        .quiz-option {
+            display: flex; align-items: center; justify-content: center;
+            background: #fffde7; margin: 15px 0; padding: 18px;
+            border-radius: 25px; border: 4px solid #fbc02d; cursor: pointer; 
+            transition: 0.2s;
+        }
+
+        .quiz-option span.opt-icon { font-size: 4.5rem; }
+        .quiz-option:hover { background: #fff9c4; border-color: #ff9800; }
+        .quiz-option:active { transform: scale(0.9); }
+
+        .toast {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: #d32f2f; color: white; padding: 15px 30px; border-radius: 30px;
+            display: none; z-index: 2000; font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-main-title">🤖 การเรียนรู้แสนสนุกโดย สมาร์ทโรโบติกส์</div>
+    <div class="header-sub-title">ระดับอนุบาล 1 (หลักสูตร 16 สัปดาห์)</div>
+    <div class="score-display" id="scoreWrapper">⭐ คะแนนของหนู: <span id="currentScore">0</span> คะแนน</div>
+</header>
+
+<div class="container">
+    <div class="pagination" id="weekNav"></div>
+    <div class="week-title-display" id="weekLabel">สัปดาห์ที่ 1</div>
+    <div class="lesson-grid" id="lessonGrid"></div>
+</div>
+
+<div id="quizModal" class="modal">
+    <div class="modal-content">
+        <span onclick="closeQuiz()" style="position:absolute; right:20px; top:10px; font-size:2.5rem; cursor:pointer;">&times;</span>
+        <h2 id="quizTitle" style="margin-bottom:25px; color: #d32f2f;">ข้อไหนคือ...</h2>
+        <div id="quizOptions"></div>
+    </div>
+</div>
+
+<div id="toast" class="toast">📢 กรุณากดฟังเรื่องราวก่อนนะจ๊ะ! 🔊</div>
+
+<script>
+    const weekData = [
+        {
+            week: 1, theme: "ร่างกายของเรา",
+            items: [
+                { icon: "👁️", title: "ดวงตา", story: "ดวงตามีไว้สำหรับมองดูสิ่งสวยงามรอบตัว และช่วยให้เราอ่านหนังสือได้", q: "ข้อไหนคือดวงตา?", ans: "👁️" },
+                { icon: "👂", title: "หู", story: "หูมีไว้ฟังเสียงเพลง เสียงนก และฟังที่คุณพ่อคุณแม่สอน", q: "ข้อไหนคือหู?", ans: "👂" },
+                { icon: "👃", title: "จมูก", story: "จมูกช่วยให้เราหายใจเอาอากาศสดชื่นเข้าไป และใช้ดมกลิ่นหอมของดอกไม้", q: "ข้อไหนคือจมูก?", ans: "👃" },
+                { icon: "👄", title: "ปาก", story: "ปากมีไว้พูดจาไพเราะและใช้ทานอาหารแสนอร่อยเพื่อให้ร่างกายแข็งแรง", q: "ข้อไหนคือปาก?", ans: "👄" },
+                { icon: "🖐️", title: "มือ", story: "มือสองข้างของเราใช้สำหรับหยิบจับสิ่งของและใช้เขียนหนังสือ", q: "ข้อไหนคือมือ?", ans: "🖐️" },
+                { icon: "🦶", title: "เท้า", story: "เท้าช่วยให้เราเดิน วิ่งเล่น และกระโดดไปมาได้อย่างสนุกสนาน", q: "ข้อไหนคือเท้า?", ans: "🦶" },
+                { icon: "🦷", title: "ฟัน", story: "ฟันสีขาวแข็งแรงใช้เคี้ยวอาหารให้ละเอียดก่อนที่เราจะกลืน", q: "ข้อไหนคือฟัน?", ans: "🦷" },
+                { icon: "💪", title: "กล้ามเนื้อ", story: "การออกกำลังกายช่วยให้กล้ามเนื้อแข็งแรง ทำให้เรายกของหนักๆ ได้", q: "ข้อไหนคือกล้ามเนื้อ?", ans: "💪" },
+                { icon: "💇", title: "เส้นผม", story: "เส้นผมช่วยปกป้องศีรษะของเรา และทำให้เราดูน่ารักเมื่อหวีให้เรียบร้อย", q: "ข้อไหนคือเส้นผม?", ans: "💇" },
+                { icon: "😊", title: "ใบหน้า", story: "ใบหน้าที่มีรอยยิ้มจะทำให้เพื่อนๆ อยากเข้ามาเล่นด้วยและมีความสุข", q: "ข้อไหนคือใบหน้า?", ans: "😊" }
+            ]
+        },
+        {
+            week: 2, theme: "ครอบครัวแสนสุข",
+            items: [
+                { icon: "👨", title: "คุณพ่อ", story: "คุณพ่อคอยดูแลปกป้องครอบครัวและทำงานหนักเพื่อพวกเราทุกคน", q: "ข้อไหนคือคุณพ่อ?", ans: "👨" },
+                { icon: "👩", title: "คุณแม่", story: "คุณแม่อบรมสั่งสอนและทำอาหารแสนอร่อยให้เราทานทุกวันเลย", q: "ข้อไหนคือคุณแม่?", ans: "👩" },
+                { icon: "👴", title: "คุณปู่คุณตา", story: "คุณปู่คุณตาใจดี ชอบเล่านิทานสนุกๆ ให้หลานๆ ฟังก่อนนอน", q: "ข้อไหนคือคุณปู่?", ans: "👴" },
+                { icon: "👵", title: "คุณย่าคุณยาย", story: "คุณย่าคุณยายคอยกอดและให้ความรักความอบอุ่นแก่พวกเราเสมอ", q: "ข้อไหนคือคุณย่า?", ans: "👵" },
+                { icon: "🧒", title: "พี่ชาย", story: "พี่ชายที่แสนดีคอยดูแลและเล่นของเล่นกับน้องอย่างสนุกสนาน", q: "ข้อไหนคือพี่ชาย?", ans: "🧒" },
+                { icon: "👧", title: "น้องสาว", story: "น้องสาวตัวน้อยชอบยิ้มและร่าเริง ทำให้ทุกคนในบ้านมีความสุข", q: "ข้อไหนคือน้องสาว?", ans: "👧" },
+                { icon: "👶", title: "เด็กทารก", story: "น้องทารกต้องการการดูแลอย่างใกล้ชิดและชอบฟังเสียงเพลงกล่อมนอน", q: "ข้อไหนคือทารก?", ans: "👶" },
+                { icon: "🏠", title: "บ้าน", story: "บ้านเป็นที่ที่สมาชิกทุกคนในครอบครัวอยู่ร่วมกันอย่างอบอุ่นและปลอดภัย", q: "ข้อไหนคือบ้าน?", ans: "🏠" },
+                { icon: "🍽️", title: "ทานข้าว", story: "การทานข้าวพร้อมหน้าพร้อมตาทั้งครอบครัวช่วยให้เราได้พูดคุยกันอย่างมีความสุข", q: "ข้อไหนคือทานข้าวพร้อมหน้า?", ans: "🍽️" },
+                { icon: "💖", title: "ความรัก", story: "ความรักความผูกพันในครอบครัวคือสิ่งที่สำคัญที่สุดที่ทำให้เรามีความสุข", q: "ข้อไหนคือความรัก?", ans: "💖" }
+            ]
+        },
+        {
+            week: 3, theme: "ของเล่นของใช้",
+            items: [
+                { icon: "🧸", title: "ตุ๊กตาหมี", story: "ตุ๊กตาหมีขนนุ่มนิ่ม เป็นเพื่อนเล่นและเพื่อนพึ่งพาเวลาเรานอนหลับ", q: "ข้อไหนคือตุ๊กตาหมี?", ans: "🧸" },
+                { icon: "🚗", title: "รถของเล่น", story: "รถของเล่นช่วยฝึกให้เราสนุกกับการจินตนาการถึงการเดินทางไปยังที่ต่างๆ", q: "ข้อไหนคือรถของเล่น?", ans: "🚗" },
+                { icon: "🧱", title: "ตัวต่อ", story: "ตัวต่อหลากสีช่วยฝึกสมองและสมาธิในการสร้างตึกหรือบ้านสวยๆ", q: "ข้อไหนคือตัวต่อ?", ans: "🧱" },
+                { icon: "⚽", title: "ลูกบอล", story: "ลูกบอลช่วยให้เราได้ออกกำลังกาย วิ่งเตะไปมากับเพื่อนๆ กลางแจ้ง", q: "ข้อไหนคือลูกบอล?", ans: "⚽" },
+                { icon: "🚲", title: "จักรยาน", story: "การขี่จักรยานช่วยให้ขาแข็งแรงและช่วยให้เราเคลื่อนที่ได้รวดเร็วขึ้น", q: "ข้อไหนคือจักรยาน?", ans: "🚲" },
+                { icon: "🎨", title: "จานสี", story: "สีสันต่างๆ ช่วยให้เราวาดรูปและระบายสีตามจินตนาการได้อย่างสนุกสนาน", q: "ข้อไหนคือจานสี?", ans: "🎨" },
+                { icon: "🪁", title: "ว่าว", story: "ว่าวจะลอยสูงบนท้องฟ้าเมื่อมีลมพัด ช่วยให้เราเพลิดเพลินกับการมองท้องฟ้า", q: "ข้อไหนคือว่าว?", ans: "🪁" },
+                { icon: "🎷", title: "ของเล่นดนตรี", story: "เสียงดนตรีจากของเล่นช่วยให้เรารู้สึกผ่อนคลายและอารมณ์ดี", q: "ข้อไหนคือของเล่นดนตรี?", ans: "🎷" },
+                { icon: "📖", title: "สมุดนิทาน", story: "สมุดนิทานมีเรื่องราวสนุกๆ และความรู้มากมายรอให้เราไปอ่าน", q: "ข้อไหนคือสมุดนิทาน?", ans: "📖" },
+                { icon: "🍭", title: "อมยิ้ม", story: "อมยิ้มรสหวานเป็นของว่างที่ให้พลังงานและทำให้เรารู้สึกร่าเริง", q: "ข้อไหนคืออมยิ้ม?", ans: "🍭" }
+            ]
+        },
+        {
+            week: 4, theme: "อาชีพที่ใฝ่ฝัน",
+            items: [
+                { icon: "👨‍⚕️", title: "คุณหมอ", story: "คุณหมอช่วยรักษาคนไข้ให้หายป่วย เพื่อให้ทุกคนกลับมาแข็งแรง", q: "ข้อไหนคือคุณหมอ?", ans: "👨‍⚕️" },
+                { icon: "👨‍🚒", title: "นักดับเพลิง", story: "นักดับเพลิงเป็นผู้กล้าหาญที่คอยช่วยดับไฟและช่วยเหลือผู้คน", q: "ข้อไหนคือนักดับเพลิง?", ans: "👨‍🚒" },
+                { icon: "👮", title: "ตำรวจ", story: "คุณตำรวจคอยดูแลความปลอดภัยเพื่อให้เมืองของเราสงบสุข", q: "ข้อไหนคือตำรวจ?", ans: "👮" },
+                { icon: "👩‍🍳", title: "พ่อครัว", story: "พ่อครัวทำอาหารแสนอร่อยและสะอาดให้พวกเราได้ทานเพื่อเพิ่มพลัง", q: "ข้อไหนคือพ่อครัว?", ans: "👩‍🍳" },
+                { icon: "👨‍🌾", title: "ชาวนา", story: "ชาวนาปลูกข้าวอย่างเหนื่อยยาก เพื่อให้เรามีข้าวทานทุกมื้อ", q: "ข้อไหนคือชาวนา?", ans: "👨‍🌾" },
+                { icon: "👨‍🏫", title: "คุณครู", story: "คุณครูสอนความรู้และมารยาทดีๆ ให้เราเป็นเด็กเก่งและนิสัยดี", q: "ข้อไหนคือคุณครู?", ans: "👨‍🏫" },
+                { icon: "👩‍🎨", title: "ศิลปิน", story: "ศิลปินวาดภาพสวยๆ ทำให้โลกใบนี้ดูมีสีสันสดใส", q: "ข้อไหนคือศิลปิน?", ans: "👩‍🎨" },
+                { icon: "👩‍🔬", title: "นักวิทยาศาสตร์", story: "นักวิทยาศาสตร์ชอบทดลองสิ่งใหม่ๆ เพื่อหาความลับของธรรมชาติ", q: "ข้อไหนคือนักวิทยาศาสตร์?", ans: "👩‍🔬" },
+                { icon: "👨‍🔧", title: "ช่างซ่อม", story: "ช่างซ่อมช่วยแก้ไขสิ่งของที่พังให้กลับมาใช้งานได้ดีเหมือนเดิม", q: "ข้อไหนคือช่างซ่อม?", ans: "👨‍🔧" },
+                { icon: "👩‍🚀", title: "นักบินอวกาศ", story: "นักบินอวกาศเดินทางไปสำรวจดวงดาวที่อยู่ไกลแสนไกลในอวกาศ", q: "ข้อไหนคือนักบินอวกาศ?", ans: "👩‍🚀" }
+            ]
+        },
+        {
+            week: 5, theme: "ธรรมชาติรอบตัว",
+            items: [
+                { icon: "🌻", title: "ดอกไม้", story: "ดอกไม้สวยงามและหอม ช่วยทำให้โลกของเราสดชื่นและน่าอยู่", q: "ข้อไหนคือดอกไม้?", ans: "🌻" },
+                { icon: "⛰️", title: "ภูเขา", story: "ภูเขาสูงใหญ่เป็นที่อยู่อาสัยของต้นไม้และสัตว์ป่ามากมาย", q: "ข้อไหนคือภูเขา?", ans: "⛰️" },
+                { icon: "☁️", title: "ก้อนเมฆ", story: "ก้อนเมฆลอยบนท้องฟ้า คอยบังแดดและตกลงมาเป็นฝน", q: "ข้อไหนคือก้อนเมฆ?", ans: "☁️" },
+                { icon: "🌈", title: "สายรุ้ง", story: "สายรุ้งมี 7 สีสวยงาม มักจะโชว์ตัวหลังจากที่ฝนหยุดตก", q: "ข้อไหนคือสายรุ้ง?", ans: "🌈" },
+                { icon: "🦋", title: "ผีเสื้อ", story: "ผีเสื้อชอบบินไปตอมดอกไม้เพื่อกินน้ำหวานและช่วยขยายพันธุ์", q: "ข้อไหนคือผีเสื้อ?", ans: "🦋" },
+                { icon: "🐝", title: "ผึ้ง", story: "ผึ้งขยันหาน้ำหวานมาทำน้ำผึ้งหวานๆ ให้เราทาน", q: "ข้อไหนคือผึ้ง?", ans: "🐝" },
+                { icon: "🍂", title: "ใบไม้", story: "ใบไม้สีเขียวช่วยสร้างอากาศที่บริสุทธิ์ให้เราหายใจสดชื่น", q: "ข้อไหนคือใบไม้?", ans: "🍂" },
+                { icon: "🪵", title: "ขอนไม้", story: "ขอนไม้แข็งแรง สามารถนำมาทำเป็นโต๊ะหรือสิ่งของเครื่องใช้ได้", q: "ข้อไหนคือขอนไม้?", ans: "🪵" },
+                { icon: "🌦️", title: "ฝนตก", story: "น้ำฝนช่วยให้ต้นไม้โต และช่วยระบายความร้อนให้โลกเย็นลง", q: "ข้อไหนคือฝนตก?", ans: "🌦️" },
+                { icon: "🌪️", title: "ลมพัด", story: "ลมพัดช่วยให้อากาศถ่ายเท ทำให้เราไม่รู้สึกร้อนจนเกินไป", q: "ข้อไหนคือลมพัด?", ans: "🌪️" }
+            ]
+        },
+        {
+            week: 6, theme: "ของใช้แสนสะดวก",
+            items: [
+                { icon: "🪑", title: "เก้าอี้", story: "เก้าอี้มีไว้สำหรับนั่งพักผ่อนเวลาที่เรารู้สึกเหนื่อย", q: "ข้อไหนคือเก้าอี้?", ans: "🪑" },
+                { icon: "🥣", title: "ถ้วยชาม", story: "ถ้วยชามใช้ใส่ข้าวและขนมเพื่อให้เราทานได้ง่ายและสะอาด", q: "ข้อไหนคือถ้วยชาม?", ans: "🥣" },
+                { icon: "🥄", title: "ช้อนส้อม", story: "ช้อนส้อมช่วยให้เราตักอาหารเข้าปากได้สะดวกโดยมือไม่เลอะ", q: "ข้อไหนคือช้อนส้อม?", ans: "🥄" },
+                { icon: "🪞", title: "กระจก", story: "กระจกช่วยให้เราเห็นหน้าตาตัวเองเพื่อให้ดูเรียบร้อย", q: "ข้อไหนคือกระจก?", ans: "🪞" },
+                { icon: "🧥", title: "เสื้อหนาว", story: "เสื้อหนาวช่วยให้ร่างกายอบอุ่นเวลาอากาศเย็น", q: "ข้อไหนคือเสื้อหนาว?", ans: "🧥" },
+                { icon: "🎒", title: "กระเป๋า", story: "กระเป๋าเป้ช่วยให้เราพกพาสมุดไปโรงเรียนได้ง่าย", q: "ข้อไหนคือกระเป๋า?", ans: "🎒" },
+                { icon: "🌂", title: "ร่ม", story: "ร่มป้องกันเราไม่ให้ตัวเปียกฝนและป้องกันแสงแดดร้อน", q: "ข้อไหนคือร่ม?", ans: "🌂" },
+                { icon: "🪥", title: "แปรงสีฟัน", story: "แปรงสีฟันช่วยทำความสะอาดฟันให้ขาวและป้องกันฟันผุ", q: "ข้อไหนคือแปรงสีฟัน?", ans: "🪥" },
+                { icon: "🧼", title: "สบู่", story: "สบู่ช่วยกำจัดเชื้อโรคออกจากร่างกายทำให้ตัวเราหอม", q: "ข้อไหนคือสบู่?", ans: "🧼" },
+                { icon: "🧻", title: "กระดาษทิชชู่", story: "ทิชชู่ใช้เช็ดทำความสะอาดปากหลังจากทานอาหาร", q: "ข้อไหนคือทิชชู่?", ans: "🧻" }
+            ]
+        },
+        {
+            week: 7, theme: "เครื่องมือเทคโนโลยี",
+            items: [
+                { icon: "💻", title: "คอมพิวเตอร์", story: "คอมพิวเตอร์ช่วยหาความรู้และทำงานได้อย่างรวดเร็วมาก", q: "ข้อไหนคือคอมพิวเตอร์?", ans: "💻" },
+                { icon: "📱", title: "มือถือ", story: "โทรศัพท์มือถือช่วยให้เราคุยกับคุณพ่อคุณแม่ได้แม้อยู่ไกล", q: "ข้อไหนคือมือถือ?", ans: "📱" },
+                { icon: "📺", title: "ทีวี", story: "ทีวีให้ความรู้และดูการ์ตูนสนุกๆ ที่เด็กๆ ชอบดู", q: "ข้อไหนคือทีวี?", ans: "📺" },
+                { icon: "📸", title: "กล้อง", story: "กล้องถ่ายรูปช่วยเก็บภาพความทรงจำเวลาไปเที่ยวกับครอบครัว", q: "ข้อไหนคือกล้อง?", ans: "📸" },
+                { icon: "🎧", title: "หูฟัง", story: "หูฟังช่วยให้เราได้ยินเสียงเพลงและนิทานได้อย่างชัดเจน", q: "ข้อไหนคือหูฟัง?", ans: "🎧" },
+                { icon: "💡", title: "หลอดไฟ", story: "หลอดไฟให้แสงสว่างทำให้เรามองเห็นในตอนกลางคืน", q: "ข้อไหนคือหลอดไฟ?", ans: "💡" },
+                { icon: "🔋", title: "ถ่าน", story: "ถ่านเป็นแหล่งพลังงานทำให้ของเล่นทำงานได้", q: "ข้อไหนคือถ่าน?", ans: "🔋" },
+                { icon: "📻", title: "วิทยุ", story: "วิทยุใช้ฟังเพลงเพราะๆ และข่าวสารที่มีประโยชน์", q: "ข้อไหนคือวิทยุ?", ans: "📻" },
+                { icon: "⏰", title: "นาฬิกาปลุก", story: "นาฬิกาปลุกช่วยให้เราตื่นไปโรงเรียนให้ทันเวลา", q: "ข้อไหนคือนาฬิกา?", ans: "⏰" },
+                { icon: "🖨️", title: "เครื่องพิมพ์", story: "เครื่องพิมพ์ช่วยพิมพ์รูปวาดออกมาให้เราเห็นบนกระดาษ", q: "ข้อไหนคือเครื่องพิมพ์?", ans: "🖨️" }
+            ]
+        },
+        {
+            week: 8, theme: "ปลอดภัยไว้ก่อน",
+            items: [
+                { icon: "🚦", title: "ไฟจราจร", story: "ไฟจราจรบอกให้รถหยุดเพื่อให้เราข้ามถนนได้ปลอดภัย", q: "ข้อไหนคือไฟจราจร?", ans: "🚦" },
+                { icon: "🪜", title: "บันได", story: "การขึ้นลงบันไดต้องค่อยๆ เดินระวังเพื่อไม่ให้หกล้ม", q: "ข้อไหนคือบันได?", ans: "🪜" },
+                { icon: "🔌", title: "ปลั๊กไฟ", story: "ปลั๊กไฟมีอันตราย ห้ามเอามือไปแหย่ ต้องให้ผู้ใหญ่ช่วยนะ", q: "ข้อไหนคือปลั๊กไฟ?", ans: "🔌" },
+                { icon: "🔪", title: "มีด", story: "มีดเป็นของมีคมที่อันตราย ใช้ทำครัวแต่ห้ามเด็กๆ เล่นนะ", q: "ข้อไหนคือมีด?", ans: "🔪" },
+                { icon: "💊", title: "ยา", story: "ยาช่วยรักษาอาการป่วยแต่ต้องให้คุณพ่อคุณแม่จัดให้เท่านั้นนะ", q: "ข้อไหนคือยา?", ans: "💊" },
+                { icon: "🔥", title: "ไฟ", story: "ไฟร้อนและอันตราย อย่าเข้าใกล้เพราะจะทำให้ผิวไหม้ได้", q: "ข้อไหนคือไฟ?", ans: "🔥" },
+                { icon: "🛟", title: "ห่วงยาง", story: "ห่วงยางช่วยพยุงตัวให้เราลอยน้ำได้เวลาฝึกว่ายน้ำ", q: "ข้อไหนคือห่วงยาง?", ans: "🛟" },
+                { icon: "🦺", title: "เสื้อชูชีพ", story: "เสื้อชูชีพช่วยป้องกันไม่ให้เราจมน้ำเวลาโดยสารเรือ", q: "ข้อไหนคือเสื้อชูชีพ?", ans: "🦺" },
+                { icon: "⛑️", title: "หมวกเหล็ก", story: "ใส่หมวกนิรภัยช่วยป้องกันหัวเวลาขี่จักรยาน", q: "ข้อไหนคือหมวกเหล็ก?", ans: "⛑️" },
+                { icon: "🧴", title: "แอลกอฮอล์", story: "เจลล้างมือช่วยฆ่าเชื้อโรคให้มือของเราสะอาดอยู่เสมอ", q: "ข้อไหนคือเจลล้างมือ?", ans: "🧴" }
+            ]
+        },
+        {
+            week: 9, theme: "อาหารไทยแสนอร่อย",
+            items: [
+                { icon: "🍛", title: "ข้าวผัด", story: "ข้าวผัดมีสารอาหารครบถ้วน ช่วยให้ร่างกายแข็งแรง", q: "ข้อไหนคือข้าวผัด?", ans: "🍛" },
+                { icon: "🍜", title: "ก๋วยเตี๋ยว", story: "ก๋วยเตี๋ยวมีเส้นลื่นๆ และน้ำซุปร้อนๆ ทานแล้วอุ่นท้องดี", q: "ข้อไหนคือก๋วยเตี๋ยว?", ans: "🍜" },
+                { icon: "🥗", title: "ส้มตำ", story: "ส้มตำมีผักมากมาย รสเปรี้ยวหวานช่วยให้ทานอร่อยขึ้น", q: "ข้อไหนคือส้มตำ?", ans: "🥗" },
+                { icon: "🍳", title: "ไข่ดาว", story: "ไข่มีโปรตีนช่วยบำรุงกล้ามเนื้อให้เราวิ่งเล่นได้เก่ง", q: "ข้อไหนคือไข่ดาว?", ans: "🍳" },
+                { icon: "🥣", title: "ต้มจืด", story: "ต้มจืดร้อนๆ มีหมูสับและผัก ทานง่ายและดีต่อสุขภาพ", q: "ข้อไหนคือต้มจืด?", ans: "🥣" },
+                { icon: "🍡", title: "ลูกชิ้น", story: "ลูกชิ้นเสียบไม้เป็นขนมทานเล่น แต่ต้องเคี้ยวให้ละเอียด", q: "ข้อไหนคือลูกชิ้น?", ans: "🍡" },
+                { icon: "🌽", title: "ข้าวโพด", story: "ข้าวโพดมีกากใยช่วยให้ท้องไม่ผูกขับถ่ายง่าย", q: "ข้อไหนคือข้าวโพด?", ans: "🌽" },
+                { icon: "🍯", title: "น้ำผึ้ง", story: "น้ำผึ้งหวานหอมจากรวงผึ้ง และช่วยแก้เจ็บคอได้ด้วย", q: "ข้อไหนคือน้ำผึ้ง?", ans: "🍯" },
+                { icon: "🥥", title: "มะพร้าว", story: "น้ำมะพร้าวช่วยให้สดชื่น และเนื้อมะพร้าวก็นำมาทำขนมได้", q: "ข้อไหนคือมะพร้าว?", ans: "🥥" },
+                { icon: "🍨", title: "ไอศกรีม", story: "ไอศกรีมเย็นชื่นใจ ช่วยให้เราหายร้อนเวลาวิ่งเล่นมา", q: "ข้อไหนคือไอศกรีม?", ans: "🍨" }
+            ]
+        },
+        {
+            week: 10, theme: "อวกาศดวงดาว",
+            items: [
+                { icon: "🌙", title: "ดวงจันทร์", story: "ดวงจันทร์ส่องแสงนวลๆ ในตอนกลางคืนเวลาเราจะนอน", q: "ข้อไหนคือดวงจันทร์?", ans: "🌙" },
+                { icon: "☀️", title: "ดวงอาทิตย์", story: "ดวงอาทิตย์ดวงใหญ่ให้แสงและความร้อนในตอนกลางวัน", q: "ข้อไหนคือดวงอาทิตย์?", ans: "☀️" },
+                { icon: "⭐", title: "ดวงดาว", story: "ดวงดาวระยิบระยับทำให้ท้องฟ้ายามค่ำคืนดูสวยงาม", q: "ข้อไหนคือดวงดาว?", ans: "⭐" },
+                { icon: "🚀", title: "จรวด", story: "จรวดพาเราพุ่งออกไปนอกโลกได้รวดเร็วมาก", q: "ข้อไหนคือจรวด?", ans: "🚀" },
+                { icon: "🪐", title: "ดาวเสาร์", story: "ดาวเสาร์มีวงแหวนล้อมรอบสวยงามโดดเด่นไม่เหมือนใคร", q: "ข้อไหนคือดาวเสาร์?", ans: "🪐" },
+                { icon: "🛰️", title: "ดาวเทียม", story: "ดาวเทียมช่วยส่งสัญญาณมือถือและทีวีมาให้เรา", q: "ข้อไหนคือดาวเทียม?", ans: "🛰️" },
+                { icon: "🛸", title: "จานบิน", story: "จานบินเป็นเรื่องราวน่าตื่นเต้นเกี่ยวกับเพื่อนจากต่างดาว", q: "ข้อไหนคือจานบิน?", ans: "🛸" },
+                { icon: "🌍", title: "โลก", story: "โลกคือบ้านหลังใหญ่ของเรา มีต้นไม้และอากาศให้เราใช้ชีวิต", q: "ข้อไหนคือโลก?", ans: "🌍" },
+                { icon: "☄️", title: "ดาวหาง", story: "ดาวหางวิ่งผ่านท้องฟ้าไปอย่างรวดเร็วและมีหางยาว", q: "ข้อไหนคือดาวหาง?", ans: "☄️" },
+                { icon: "🔭", title: "กล้องส่อง", story: "กล้องดูดาวช่วยให้เรามองเห็นดวงดาวไกลๆ ได้ชัดขึ้น", q: "ข้อไหนคือกล้องดูดาว?", ans: "🔭" }
+            ]
+        },
+        {
+            week: 11, theme: "สัตว์เลี้ยงแสนรัก",
+            items: [
+                { icon: "🐶", title: "น้องหมา", story: "น้องหมาเป็นเพื่อนที่ซื่อสัตย์ ชอบกระดิกหางและเห่าโฮ่งๆ เวลาดีใจ", q: "ข้อไหนคือน้องหมา?", ans: "🐶" },
+                { icon: "🐱", title: "น้องแมว", story: "น้องแมวชอบร้องเมี๊ยวๆ และชอบให้เราลูบขนเบาๆ อย่างอ่อนโยน", q: "ข้อไหนคือน้องแมว?", ans: "🐱" },
+                { icon: "🐰", title: "กระต่าย", story: "กระต่ายหูยาวชอบกระโดดไปมาและชอบกินแครอทเป็นที่สุด", q: "ข้อไหนคือกระต่าย?", ans: "🐰" },
+                { icon: "🐹", title: "หนูแฮมสเตอร์", story: "หนูแฮมสเตอร์ตัวเล็กๆ ชอบวิ่งบนวงล้ออย่างสนุกสนาน", q: "ข้อไหนคือหนูแฮมสเตอร์?", ans: "🐹" },
+                { icon: "🐦", title: "นกน้อย", story: "นกน้อยมีปีกบินไปมาบนท้องฟ้าและร้องเพลงเพราะๆ ให้เราฟัง", q: "ข้อไหนคือนกน้อย?", ans: "🐦" },
+                { icon: "🐠", title: "ปลาทอง", story: "ปลาทองว่ายน้ำไปมาในตู้ และชอบพ่นฟองอากาศปุ๋งๆ", q: "ข้อไหนคือปลาทอง?", ans: "🐠" },
+                { icon: "🐢", title: "เต่า", story: "เต่าเดินช้าๆ และมีกระดองแข็งไว้ป้องกันตัวจากอันตราย", q: "ข้อไหนคือเต่า?", ans: "🐢" },
+                { icon: "🦜", title: "นกแก้ว", story: "นกแก้วมีขนสีสวยและบางตัวสามารถเลียนเสียงคนพูดได้ด้วย", q: "ข้อไหนคือนกแก้ว?", ans: "🦜" },
+                { icon: "🍗", title: "อาหารสัตว์", story: "เราต้องให้อาหารสัตว์เลี้ยงสม่ำเสมอเพื่อให้เขาโตไวๆ", q: "ข้อไหนคืออาหารสัตว์?", ans: "🍗" },
+                { icon: "🏠", title: "บ้านสัตว์", story: "สัตว์เลี้ยงต้องการที่นอนที่สะอาดและอบอุ่นเหมือนพวกเรา", q: "ข้อไหนคือบ้านสัตว์?", ans: "🏠" }
+            ]
+        },
+        {
+            week: 12, theme: "สีสันแสนสวย",
+            items: [
+                { icon: "🔴", title: "สีแดง", story: "สีแดงเหมือนสีของแอปเปิ้ลที่แสนอร่อยและสีของพระอาทิตย์ยามเช้า", q: "ข้อไหนคือสีแดง?", ans: "🔴" },
+                { icon: "🔵", title: "สีน้ำเงิน", story: "สีน้ำเงินเหมือนสีของท้องฟ้ากว้างและสีของน้ำทะเลใสๆ", q: "ข้อไหนคือสีน้ำเงิน?", ans: "🔵" },
+                { icon: "🟡", title: "สีเหลือง", story: "สีเหลืองเหมือนสีของดอกทานตะวันที่บานแฉ่งและสีของกล้วยหอม", q: "ข้อไหนคือสีเหลือง?", ans: "🟡" },
+                { icon: "🟢", title: "สีเขียว", story: "สีเขียวเหมือนสีของใบไม้และหญ้าในสนามที่เราวิ่งเล่น", q: "ข้อไหนคือสีเขียว?", ans: "🟢" },
+                { icon: "🟠", title: "สีส้ม", story: "สีส้มเหมือนสีของผลส้มที่มีรสเปรี้ยวหวานสดชื่น", q: "ข้อไหนคือสีส้ม?", ans: "🟠" },
+                { icon: "🟣", title: "สีม่วง", story: "สีม่วงเหมือนสีขององุ่นพวงโตและสีของดอกอัญชัน", q: "ข้อไหนคือสีม่วง?", ans: "🟣" },
+                { icon: "⚪", title: "สีขาว", story: "สีขาวเหมือนสีของก้อนเมฆและสีของนมที่ทำให้ร่างกายแข็งแรง", q: "ข้อไหนคือสีขาว?", ans: "⚪" },
+                { icon: "⚫", title: "สีดำ", story: "สีดำเหมือนสีของท้องฟ้ายามค่ำคืนที่เรามองเห็นดวงดาวชัดเจน", q: "ข้อไหนคือสีดำ?", ans: "⚫" },
+                { icon: "💗", title: "สีชมพู", story: "สีชมพูเหมือนสีของดอกกุหลาบและสีของแก้มเด็กๆ เวลาเขิน", q: "ข้อไหนคือสีชมพู?", ans: "💗" },
+                { icon: "🟤", title: "สีน้ำตาล", story: "สีน้ำตาลเหมือนสีของขอนไม้และสีของช็อกโกแลตแสนหวาน", q: "ข้อไหนคือสีน้ำตาล?", ans: "🟤" }
+            ]
+        },
+        {
+            week: 13, theme: "ยานพาหนะ",
+            items: [
+                { icon: "🚗", title: "รถยนต์", story: "รถยนต์ช่วยพาเราเดินทางไปเที่ยวกับครอบครัวได้อย่างสะดวกสบาย", q: "ข้อไหนคือรถยนต์?", ans: "🚗" },
+                { icon: "🚌", title: "รถเมล์", story: "รถเมล์คันใหญ่รับส่งผู้คนมากมายไปทำงานและไปโรงเรียน", q: "ข้อไหนคือรถเมล์?", ans: "🚌" },
+                { icon: "🚲", title: "จักรยาน", story: "จักรยานช่วยให้เราได้ออกกำลังขาและเป็นมิตรกับธรรมชาติ", q: "ข้อไหนคือจักรยาน?", ans: "🚲" },
+                { icon: "🛵", title: "มอเตอร์ไซค์", story: "มอเตอร์ไซค์วิ่งได้รวดเร็วและซอกแซกไปตามถนนได้ดี", q: "ข้อไหนคือมอเตอร์ไซค์?", ans: "🛵" },
+                { icon: "🚂", title: "รถไฟ", story: "รถไฟวิ่งบนรางยาวๆ และร้อง ปู๊น ปู๊น เวลาออกเดินทาง", q: "ข้อไหนคือรถไฟ?", ans: "🚂" },
+                { icon: "✈️", title: "เครื่องบิน", story: "เครื่องบินบินสูงบนท้องฟ้าเหมือนนก พาเราไปที่ไกลๆ ได้เร็วมาก", q: "ข้อไหนคือเครื่องบิน?", ans: "✈️" },
+                { icon: "🚁", title: "เฮลิคอปเตอร์", story: "เฮลิคอปเตอร์มีใบพัดอยู่ข้างบน สามารถบินขึ้นตรงๆ ได้เลย", q: "ข้อไหนคือเฮลิคอปเตอร์?", ans: "🚁" },
+                { icon: "🚢", title: "เรือยนต์", story: "เรือยนต์ลำใหญ่ลอยน้ำได้และพาเราข้ามทะเลกว้างใหญ่", q: "ข้อไหนคือเรือ?", ans: "🚢" },
+                { icon: "🚑", title: "รถพยาบาล", story: "รถพยาบาลมีเสียงไซเรนดังเพื่อบอกให้รถคันอื่นหลีกทางให้คนป่วย", q: "ข้อไหนคือรถพยาบาล?", ans: "🚑" },
+                { icon: "🚒", title: "รถดับเพลิง", story: "รถดับเพลิงคันสีแดงมีถังน้ำขนาดใหญ่ไว้ดับไฟที่ลุกไหม้", q: "ข้อไหนคือรถดับเพลิง?", ans: "🚒" }
+            ]
+        },
+        {
+            week: 14, theme: "ผักและผลไม้",
+            items: [
+                { icon: "🍎", title: "แอปเปิ้ล", story: "แอปเปิ้ลสีแดงรสหวานกรอบ ทานแล้วช่วยให้สุขภาพดี", q: "ข้อไหนคือแอปเปิ้ล?", ans: "🍎" },
+                { icon: "🍌", title: "กล้วยหอม", story: "กล้วยสีเหลืองมีวิตามินสูง ช่วยให้เด็กๆ มีพลังงานวิ่งเล่น", q: "ข้อไหนคือกล้วย?", ans: "🍌" },
+                { icon: "🍉", title: "แตงโม", story: "แตงโมสีแดงสดรสหวานฉ่ำ ช่วยคลายร้อนได้เป็นอย่างดี", q: "ข้อไหนคือแตงโม?", ans: "🍉" },
+                { icon: "🍇", title: "องุ่น", story: "องุ่นเป็นพวงสีม่วง รสเปรี้ยวหวาน ทานสนุกและอร่อยมาก", q: "ข้อไหนคือองุ่น?", ans: "🍇" },
+                { icon: "🍍", title: "สับปะรด", story: "สับปะรดมีตามากมายรอบตัว และมีรสชาติสดชื่นซาบซ่า", q: "ข้อไหนคือสับปะรด?", ans: "🍍" },
+                { icon: "🥕", title: "แครอท", story: "แครอทสีส้มช่วยบำรุงสายตาให้สดใสและมองเห็นได้ชัดเจน", q: "ข้อไหนคือแครอท?", ans: "🥕" },
+                { icon: "🥦", title: "บล็อกโคลี่", story: "ผักสีเขียวเหมือนต้นไม้เล็กๆ ช่วยให้ร่างกายขับถ่ายสะดวก", q: "ข้อไหนคือบล็อกโคลี่?", ans: "🥦" },
+                { icon: "🌽", title: "ข้าวโพด", story: "ข้าวโพดสีเหลืองเรียงเม็ดสวย มีรสหวานและมีกากใยอาหารสูง", q: "ข้อไหนคือข้าวโพด?", ans: "🌽" },
+                { icon: "🍅", title: "มะเขือเทศ", story: "มะเขือเทศสีแดงช่วยบำรุงผิวพรรณให้เปล่งปลั่งสดใส", q: "ข้อไหนคือมะเขือเทศ?", ans: "🍅" },
+                { icon: "🍓", title: "สตรอว์เบอร์รี่", story: "สตรอว์เบอร์รี่สีแดงมีรสเปรี้ยวหวานและมีกลิ่นหอมชวนทาน", q: "ข้อไหนคือสตรอว์เบอร์รี่?", ans: "🍓" }
+            ]
+        },
+        {
+            week: 15, theme: "กิจวัตรประจำวัน",
+            items: [
+                { icon: "☀️", title: "ตื่นนอน", story: "หนูตื่นนอนตอนเช้าด้วยความสดชื่นพร้อมที่จะไปโรงเรียน", q: "ข้อไหนคือตื่นนอน?", ans: "☀️" },
+                { icon: "🛁", title: "อาบน้ำ", story: "การอาบน้ำฟอกสบู่ช่วยให้ร่างกายสะอาดและไม่มีเชื้อโรค", q: "ข้อไหนคืออาบน้ำ?", ans: "🛁" },
+                { icon: "🪥", title: "แปรงสีฟัน", story: "เราควรแปรงฟันทุกเช้าและก่อนนอนเพื่อให้ฟันขาวแข็งแรง", q: "ข้อไหนคือแปรงสีฟัน?", ans: "🪥" },
+                { icon: "👕", title: "แต่งตัว", story: "หนูเริ่มหัดใส่เสื้อผ้าเองเพื่อให้คุณพ่อคุณแม่ภูมิใจ", q: "ข้อไหนคือแต่งตัว?", ans: "👕" },
+                { icon: "🍳", title: "กินมื้อเช้า", story: "อาหารเช้าเป็นมื้อที่สำคัญที่สุดที่ทำให้สมองของหนูแล่นดี", q: "ข้อไหนคือกินข้าวเช้า?", ans: "🍳" },
+                { icon: "🏫", title: "ไปโรงเรียน", story: "ที่โรงเรียนมีเพื่อนๆ และคุณครูใจดีรอสอนหนังสือหนูอยู่", q: "ข้อไหนคือโรงเรียน?", ans: "🏫" },
+                { icon: "🎨", title: "เรียนหนังสือ", story: "การตั้งใจเรียนและวาดรูปช่วยให้หนูเป็นเด็กที่เก่งและมีความคิดสร้างสรรค์", q: "ข้อไหนคือเรียนหนังสือ?", ans: "🎨" },
+                { icon: "🧸", title: "เล่นของเล่น", story: "หลังเรียนเสร็จหนูได้เล่นของเล่นกับเพื่อนๆ อย่างสนุกสนาน", q: "ข้อไหนคือเล่นของเล่น?", ans: "🧸" },
+                { icon: "🧹", title: "เก็บของ", story: "เล่นเสร็จแล้วต้องช่วยกันเก็บของเข้าที่ให้เรียบร้อยนะจ๊ะ", q: "ข้อไหนคือเก็บของ?", ans: "🧹" },
+                { icon: "🌙", title: "เข้านอน", story: "หนูเข้านอนแต่หัวค่ำเพื่อให้ร่างกายได้พักผ่อนและโตไวๆ", q: "ข้อไหนคือเข้านอน?", ans: "🌙" }
+            ]
+        },
+        {
+            week: 16, theme: "ทักษะชีวิตเบื้องต้น",
+            items: [
+                { icon: "🙏", title: "การไหว้", story: "การไหว้เป็นการแสดงความเคารพและทักทายผู้ใหญ่ที่น่ารัก", q: "ข้อไหนคือการไหว้?", ans: "🙏" },
+                { icon: "🤝", title: "การแบ่งปัน", story: "การแบ่งปันของเล่นให้เพื่อนทำให้เรามีเพื่อนรักเพิ่มขึ้น", q: "ข้อไหนคือการแบ่งปัน?", ans: "🤝" },
+                { icon: "🚮", title: "ทิ้งขยะ", story: "ทิ้งขยะลงถังทุกครั้งช่วยให้โรงเรียนและบ้านของเราสะอาด", q: "ข้อไหนคือทิ้งขยะ?", ans: "🚮" },
+                { icon: "🙌", title: "ล้างมือ", story: "เราต้องล้างมือก่อนทานอาหารเพื่อป้องกันท้องเสียนะจ๊ะ", q: "ข้อไหนคือล้างมือ?", ans: "🙌" },
+                { icon: "🔇", title: "ใช้เสียงเบา", story: "เวลาอยู่ในห้องสมุดหรือตอนเพื่อนหลับ เราต้องไม่เสียงดังนะ", q: "ข้อไหนคือเงียบๆ?", ans: "🔇" },
+                { icon: "🚶", title: "เดินเป็นแถว", story: "การเดินตามแถวช่วยให้เราเป็นระเบียบและไม่พลัดหลงกัน", q: "ข้อไหนคือเดินแถว?", ans: "🚶" },
+                { icon: "🧦", title: "ใส่ถุงเท้า", story: "หนูหัดใส่ถุงเท้าและรองเท้าเองก่อนออกจากบ้านทุกวัน", q: "ข้อไหนคือถุงเท้า?", ans: "🧦" },
+                { icon: "🥛", title: "ดื่มนม", story: "ดื่มนมหมดแก้วทุกวันช่วยให้กระดูกแข็งแรงและตัวสูงใหญ่", q: "ข้อไหนคือดื่มนม?", ans: "🥛" },
+                { icon: "🌻", title: "รดน้ำต้นไม้", story: "การช่วยรดน้ำต้นไม้ทำให้ต้นไม้สดชื่นและโลกของเราสวยงาม", q: "ข้อไหนคือรดน้ำต้นไม้?", ans: "🌻" },
+                { icon: "🥰", title: "เด็กดี", story: "การเป็นเด็กดีเชื่อฟังคุณครูจะทำให้ทุกคนรักและเอ็นดูหนู", q: "ข้อไหนคือเด็กดี?", ans: "🥰" }
+            ]
+        }
+    ];
+
+    let currentWeek = 1;
+    let score = 0;
+    let listenedStatus = {}; 
+    const dummyIcons = ["🧸", "🍎", "🚗", "🍦", "🐱", "🐶", "🌳", "🚁", "🚲", "🍭", "⚽", "🪁", "🌈", "🦋", "🍄", "🍉", "🎈", "🦆", "🍓", "🧁"];
+
+    function initNav() {
+        const nav = document.getElementById('weekNav');
+        nav.innerHTML = '';
+        weekData.forEach(w => {
+            const btn = document.createElement('button');
+            btn.className = `page-btn ${w.week === currentWeek ? 'active' : ''}`;
+            btn.innerText = `สัปดาห์ ${w.week}`;
+            btn.onclick = () => changeWeek(w.week);
+            nav.appendChild(btn);
+        });
+    }
+
+    function renderLessons() {
+        const grid = document.getElementById('lessonGrid');
+        const weekLabel = document.getElementById('weekLabel');
+        grid.innerHTML = '';
+        const weekGroup = weekData.find(w => w.week === currentWeek);
+        if(!weekGroup) return;
+
+        weekLabel.innerText = `สัปดาห์ที่ ${currentWeek}: ${weekGroup.theme}`;
+
+        weekGroup.items.forEach((item, idx) => {
+            const itemKey = `w${currentWeek}i${idx}`;
+            const isDone = listenedStatus[itemKey] === true;
+            
+            const card = document.createElement('div');
+            card.className = 'lesson-card';
+            card.innerHTML = `
+                <span class="icon-box">${item.icon}</span>
+                <h3>${item.title}</h3>
+                <div class="btn-container">
+                    <button class="btn-audio" onclick="speakStory('${itemKey}', '${item.story}')">
+                        <span>🔊</span> ฟังเรื่องราว
+                    </button>
+                    <button id="testBtn-${itemKey}" 
+                            class="btn-play ${isDone ? '' : 'locked'}" 
+                            onclick="tryOpenQuiz('${itemKey}', ${currentWeek}, ${idx})">
+                        <span>📝</span> ทดสอบ
+                    </button>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    function changeWeek(weekNum) {
+        currentWeek = weekNum;
+        initNav();
+        renderLessons();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function speak(text, onEnd) {
+        window.speechSynthesis.cancel();
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.lang = 'th-TH';
+        msg.pitch = 1.1;
+        msg.rate = 1.0;
+        if (onEnd) {
+            msg.onend = onEnd;
+        }
+        window.speechSynthesis.speak(msg);
+    }
+
+    function speakStory(key, text) {
+        speak(text, () => {
+            listenedStatus[key] = true;
+            const btn = document.getElementById(`testBtn-${key}`);
+            if (btn) btn.classList.remove('locked');
+        });
+    }
+
+    function tryOpenQuiz(key, weekNum, index) {
+        if (listenedStatus[key]) {
+            openQuiz(weekNum, index);
+        } else {
+            showToast();
+            speak("กรุณากดฟังเรื่องราวก่อนนะจ๊ะ");
+        }
+    }
+
+    function showToast() {
+        const toast = document.getElementById('toast');
+        toast.style.display = 'block';
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 2500);
+    }
+
+    function openQuiz(weekNum, index) {
+        const weekItem = weekData.find(w => w.week === weekNum);
+        const item = weekItem.items[index];
+        
+        document.getElementById('quizTitle').innerText = item.q;
+        const optionsDiv = document.getElementById('quizOptions');
+        optionsDiv.innerHTML = '';
+
+        let options = [{ icon: item.icon, isCorrect: true, title: item.title }];
+        let availableDummies = dummyIcons.filter(d => d !== item.icon);
+        
+        while (options.length < 3) {
+            let randIdx = Math.floor(Math.random() * availableDummies.length);
+            options.push({ icon: availableDummies[randIdx], isCorrect: false });
+            availableDummies.splice(randIdx, 1);
+        }
+        options.sort(() => Math.random() - 0.5);
+
+        options.forEach(opt => {
+            const b = document.createElement('div');
+            b.className = 'quiz-option';
+            b.innerHTML = `<span class="opt-icon">${opt.icon}</span>`;
+            b.onclick = () => {
+                if (opt.isCorrect) {
+                    speak(`${opt.title} ถูกต้องแล้วจ้า เก่งมากเลย`);
+                    b.style.backgroundColor = "#c8e6c9";
+                    b.style.borderColor = "#4caf50";
+                    updateScore(10); // เพิ่มคะแนนครั้งละ 10
+                    setTimeout(closeQuiz, 1500);
+                } else {
+                    speak(`ยังไม่ใช่นะ ลองหาภาพ ${item.title} ใหม่นะ`);
+                    b.style.backgroundColor = "#ffcdd2";
+                    b.style.borderColor = "#f44336";
+                }
+            };
+            optionsDiv.appendChild(b);
+        });
+
+        document.getElementById('quizModal').style.display = 'flex';
+        speak(item.q);
+    }
+
+    function updateScore(points) {
+        score += points;
+        document.getElementById('currentScore').innerText = score;
+        const wrapper = document.getElementById('scoreWrapper');
+        wrapper.style.transform = 'scale(1.2)';
+        setTimeout(() => {
+            wrapper.style.transform = 'scale(1)';
+        }, 300);
+    }
+
+    function closeQuiz() {
+        document.getElementById('quizModal').style.display = 'none';
+        window.speechSynthesis.cancel();
+    }
+
+    window.onload = () => {
+        initNav();
+        renderLessons();
+    };
+</script>
+</body>
+</html>
